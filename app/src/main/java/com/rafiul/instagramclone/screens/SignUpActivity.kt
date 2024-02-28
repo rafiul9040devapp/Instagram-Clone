@@ -1,5 +1,6 @@
 package com.rafiul.instagramclone.screens
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
@@ -70,6 +71,7 @@ class SignUpActivity : AppCompatActivity() {
                     .document(Firebase.auth.currentUser!!.uid)
                     .set(user).addOnCompleteListener {
                         Toast.makeText(this, "Login SuccessFully", Toast.LENGTH_LONG).show()
+                        startActivity(Intent(this,HomeActivity::class.java))
                     }
             } else {
                 Toast.makeText(this, result.exception?.localizedMessage, Toast.LENGTH_LONG)
