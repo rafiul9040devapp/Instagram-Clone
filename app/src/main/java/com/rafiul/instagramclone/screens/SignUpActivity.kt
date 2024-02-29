@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContract
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.text.HtmlCompat
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
@@ -15,6 +16,10 @@ import com.rafiul.instagramclone.databinding.ActivitySignUpBinding
 import com.rafiul.instagramclone.models.User
 import com.rafiul.instagramclone.utils.USER_NODE
 import com.rafiul.instagramclone.utils.USER_PROFILE_FOLDER
+import com.rafiul.instagramclone.utils.getLongToast
+import com.rafiul.instagramclone.utils.getShortToast
+import com.rafiul.instagramclone.utils.navigateToNextActivity
+import com.rafiul.instagramclone.utils.navigateToNextActivityWithReplacement
 import com.rafiul.instagramclone.utils.uploadImage
 
 class SignUpActivity : AppCompatActivity() {
@@ -36,24 +41,35 @@ class SignUpActivity : AppCompatActivity() {
     }
 
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivitySignUpBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        val text =
+            "<font color=#FF000000>Already Have An Account</font> <font color=#077DB3>Login?</font>"
+        binding.textViewLogin.text = HtmlCompat.fromHtml(text, HtmlCompat.FROM_HTML_MODE_LEGACY)
+
         user = User()
 
-        binding.filledButtonRegister.setOnClickListener {
-            if (isAnyFieldEmpty()) {
-                Toast.makeText(this, "Please Fill The Input Fields", Toast.LENGTH_LONG).show()
-            } else {
-                getLoginStatus()
-            }
-        }
+        binding.apply {
 
-        binding.addImage.setOnClickListener {
-            launcher.launch("image/*")
+            filledButtonRegister.setOnClickListener {
+                if (isAnyFieldEmpty()) {
+                    getShortToast(this@SignUpActivity, "Please Fill The Input Fields")
+                } else {
+                    getLoginStatus()
+                }
+            }
+
+            addImage.setOnClickListener {
+                launcher.launch("image/*")
+            }
+
+            textViewLogin.setOnClickListener {
+                navigateToNextActivity(this@SignUpActivity, LoginActivity::class.java)
+            }
+
         }
     }
 
@@ -66,24 +82,27 @@ class SignUpActivity : AppCompatActivity() {
                 user.name = binding.userNameTextField.editText?.text.toString().trim()
                 user.email = binding.userEmailTextField.editText?.text.toString().trim()
                 user.password = binding.passwordTextField.editText?.text.toString().trim()
-//                user = User(userName, userEmail, password)
                 Firebase.firestore.collection(USER_NODE)
                     .document(Firebase.auth.currentUser!!.uid)
                     .set(user).addOnCompleteListener {
-                        Toast.makeText(this, "Login SuccessFully", Toast.LENGTH_LONG).show()
-                        startActivity(Intent(this,HomeActivity::class.java))
+                        getShortToast(this@SignUpActivity, "Login SuccessFully")
+                        navigateToNextActivityWithReplacement(
+                            this@SignUpActivity,
+                            HomeActivity::class.java
+                        )
                     }
             } else {
-                Toast.makeText(this, result.exception?.localizedMessage, Toast.LENGTH_LONG)
-                    .show()
+                result.exception?.localizedMessage?.let { message ->
+                    getLongToast(this@SignUpActivity, message)
+                }
             }
         }
     }
 
     private fun isAnyFieldEmpty(): Boolean {
-        val userName = binding.userNameTextField.editText?.text.toString()
-        val userEmail = binding.userEmailTextField.editText?.text.toString()
-        val password = binding.passwordTextField.editText?.text.toString()
+        val userName = binding.userNameTextField.editText?.text.toString().trim()
+        val userEmail = binding.userEmailTextField.editText?.text.toString().trim()
+        val password = binding.passwordTextField.editText?.text.toString().trim()
         return userName.isEmpty() || userEmail.isEmpty() || password.isEmpty()
     }
 

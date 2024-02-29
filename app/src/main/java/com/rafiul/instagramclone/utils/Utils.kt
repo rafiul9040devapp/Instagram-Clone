@@ -1,6 +1,8 @@
 package com.rafiul.instagramclone.utils
 
+import android.content.Context
 import android.net.Uri
+import android.widget.Toast
 import com.google.firebase.storage.FirebaseStorage
 import java.util.UUID
 
@@ -22,3 +24,8 @@ fun uploadImage(uri: Uri, folderName: String, callback: (String?) -> Unit) {
             callback(null)
         }
 }
+
+
+
+fun getLongToast(context: Context,message:String) =  Toast.makeText(context,message, Toast.LENGTH_LONG).show()
+fun getShortToast(context: Context,message:String) = Toast.makeText(context,message, Toast.LENGTH_SHORT).show()
