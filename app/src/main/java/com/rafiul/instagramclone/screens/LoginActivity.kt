@@ -32,24 +32,26 @@ class LoginActivity : AppCompatActivity() {
                     getLongToast(this@LoginActivity,"Please Fill All The Fields")
                 }else{
                     val user = User(email = userEmail, password = userPassword)
-
-                    Firebase.auth.signInWithEmailAndPassword(user.email ?: "", user.password ?: "").addOnCompleteListener {
-                       if (it.isSuccessful){
-                          navigateToNextActivityWithReplacement(this@LoginActivity,HomeActivity::class.java)
-                       }else{
-                           it.exception?.localizedMessage?.let { message ->
-                               getShortToast(this@LoginActivity,message)
-                           }
-                       }
-                    }
-
-
+                    checkValidUser(user)
                 }
             }
-
         }
+    }
 
-
+    private fun checkValidUser(user: User) {
+        Firebase.auth.signInWithEmailAndPassword(user.email ?: "", user.password ?: "")
+            .addOnCompleteListener {
+                if (it.isSuccessful) {
+                    navigateToNextActivityWithReplacement(
+                        this@LoginActivity,
+                        HomeActivity::class.java
+                    )
+                } else {
+                    it.exception?.localizedMessage?.let { message ->
+                        getShortToast(this@LoginActivity, message)
+                    }
+                }
+            }
     }
 
     private fun isFieldEmpty(): Boolean {
