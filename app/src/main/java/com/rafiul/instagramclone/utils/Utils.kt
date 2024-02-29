@@ -27,5 +27,5 @@ fun uploadImage(uri: Uri, folderName: String, callback: (String?) -> Unit) {
 
 
 
-fun getLongToast(context: Context,message:String) =  Toast.makeText(context,message, Toast.LENGTH_LONG).show()
-fun getShortToast(context: Context,message:String) = Toast.makeText(context,message, Toast.LENGTH_SHORT).show()
+fun showLongToast(context: Context, message:String) =  Toast.makeText(context,message, Toast.LENGTH_LONG).show()
+fun showShortToast(context: Context, message:String) = Toast.makeText(context,message, Toast.LENGTH_SHORT).show()

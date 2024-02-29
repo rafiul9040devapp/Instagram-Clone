@@ -1,23 +1,20 @@
-package com.rafiul.instagramclone.screens
+package com.rafiul.instagramclone.screens.activities
 
-import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContract
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.text.HtmlCompat
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.firestore
-import com.rafiul.instagramclone.R
 import com.rafiul.instagramclone.databinding.ActivitySignUpBinding
 import com.rafiul.instagramclone.models.User
 import com.rafiul.instagramclone.utils.USER_NODE
 import com.rafiul.instagramclone.utils.USER_PROFILE_FOLDER
-import com.rafiul.instagramclone.utils.getLongToast
-import com.rafiul.instagramclone.utils.getShortToast
+import com.rafiul.instagramclone.utils.showLongToast
+import com.rafiul.instagramclone.utils.showShortToast
 import com.rafiul.instagramclone.utils.navigateToNextActivity
 import com.rafiul.instagramclone.utils.navigateToNextActivityWithReplacement
 import com.rafiul.instagramclone.utils.uploadImage
@@ -56,7 +53,7 @@ class SignUpActivity : AppCompatActivity() {
 
             filledButtonRegister.setOnClickListener {
                 if (isAnyFieldEmpty()) {
-                    getShortToast(this@SignUpActivity, "Please Fill The Input Fields")
+                    showShortToast(this@SignUpActivity, "Please Fill The Input Fields")
                 } else {
                     getLoginStatus()
                 }
@@ -85,7 +82,7 @@ class SignUpActivity : AppCompatActivity() {
                 Firebase.firestore.collection(USER_NODE)
                     .document(Firebase.auth.currentUser!!.uid)
                     .set(user).addOnCompleteListener {
-                        getShortToast(this@SignUpActivity, "Login SuccessFully")
+                        showShortToast(this@SignUpActivity, "Login SuccessFully")
                         navigateToNextActivityWithReplacement(
                             this@SignUpActivity,
                             HomeActivity::class.java
@@ -93,7 +90,7 @@ class SignUpActivity : AppCompatActivity() {
                     }
             } else {
                 result.exception?.localizedMessage?.let { message ->
-                    getLongToast(this@SignUpActivity, message)
+                    showLongToast(this@SignUpActivity, message)
                 }
             }
         }

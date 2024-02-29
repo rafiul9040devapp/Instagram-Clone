@@ -1,18 +1,13 @@
-package com.rafiul.instagramclone.screens
+package com.rafiul.instagramclone.screens.activities
 
-import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.provider.ContactsContract.CommonDataKinds.Email
-import android.widget.Toast
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
-import com.rafiul.instagramclone.R
 import com.rafiul.instagramclone.databinding.ActivityLoginBinding
 import com.rafiul.instagramclone.models.User
-import com.rafiul.instagramclone.utils.getLongToast
-import com.rafiul.instagramclone.utils.getShortToast
-import com.rafiul.instagramclone.utils.navigateToNextActivity
+import com.rafiul.instagramclone.utils.showLongToast
+import com.rafiul.instagramclone.utils.showShortToast
 import com.rafiul.instagramclone.utils.navigateToNextActivityWithReplacement
 
 class LoginActivity : AppCompatActivity() {
@@ -29,7 +24,7 @@ class LoginActivity : AppCompatActivity() {
         binding.apply {
             filledButtonLogin.setOnClickListener {
                 if (isFieldEmpty()){
-                    getLongToast(this@LoginActivity,"Please Fill All The Fields")
+                    showLongToast(this@LoginActivity,"Please Fill All The Fields")
                 }else{
                     val user = User(email = userEmail, password = userPassword)
                     checkValidUser(user)
@@ -40,15 +35,15 @@ class LoginActivity : AppCompatActivity() {
 
     private fun checkValidUser(user: User) {
         Firebase.auth.signInWithEmailAndPassword(user.email ?: "", user.password ?: "")
-            .addOnCompleteListener {
-                if (it.isSuccessful) {
+            .addOnCompleteListener { response ->
+                if (response.isSuccessful) {
                     navigateToNextActivityWithReplacement(
                         this@LoginActivity,
                         HomeActivity::class.java
                     )
                 } else {
-                    it.exception?.localizedMessage?.let { message ->
-                        getShortToast(this@LoginActivity, message)
+                    response.exception?.localizedMessage?.let { message ->
+                        showShortToast(this@LoginActivity, message)
                     }
                 }
             }
