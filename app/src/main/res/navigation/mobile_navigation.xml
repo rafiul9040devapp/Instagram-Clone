@@ -14,7 +14,7 @@
         android:name="com.rafiul.instagramclone.screens.fragments.SearchFragment"
         android:label="fragment_search"
         tools:layout="@layout/fragment_search" />
-    <fragment
+    <dialog
         android:id="@+id/navigation_post"
         android:name="com.rafiul.instagramclone.screens.fragments.PostFragment"
         android:label="fragment_post"
