@@ -23,7 +23,6 @@ class MainActivity : AppCompatActivity() {
         }, 3000)
 
     }
-
     private fun checkLoginStatus() {
         if (FirebaseAuth.getInstance().currentUser == null) {
             navigateToNextActivityWithReplacement(this@MainActivity, SignUpActivity::class.java)

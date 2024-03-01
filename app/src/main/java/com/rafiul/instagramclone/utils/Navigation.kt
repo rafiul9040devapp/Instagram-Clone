@@ -3,6 +3,7 @@ package com.rafiul.instagramclone.utils
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import com.rafiul.instagramclone.screens.fragments.ProfileFragment
 
 fun navigateToNextActivity(currentActivity: Activity, destinationActivity: Class<*>) {
     val intent = Intent(currentActivity, destinationActivity)
@@ -22,6 +23,16 @@ fun navigateToNextActivityWithData(currentActivity: Activity, destinationActivit
     }
     currentActivity.startActivity(intent)
 }
+
+fun navigateToNextActivityWithReplacementAndData(currentActivity: Activity, destinationActivity: Class<*>, data: Bundle?) {
+    val intent = Intent(currentActivity, destinationActivity)
+    data?.let { bundleData ->
+        intent.putExtras(bundleData)
+    }
+    currentActivity.startActivity(intent)
+    currentActivity.finish()
+}
+
 
 
 //implementation
