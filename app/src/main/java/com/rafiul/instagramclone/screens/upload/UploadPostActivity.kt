@@ -1,6 +1,7 @@
 package com.rafiul.instagramclone.screens.upload
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.Firebase
@@ -8,8 +9,10 @@ import com.google.firebase.auth.auth
 import com.google.firebase.firestore.firestore
 import com.rafiul.instagramclone.databinding.ActivityUploadPostBinding
 import com.rafiul.instagramclone.models.Post
+import com.rafiul.instagramclone.screens.activities.HomeActivity
 import com.rafiul.instagramclone.utils.POST
 import com.rafiul.instagramclone.utils.POST_FOLDER
+import com.rafiul.instagramclone.utils.navigateToNextActivityWithReplacement
 import com.rafiul.instagramclone.utils.uploadImage
 
 class UploadPostActivity : AppCompatActivity() {
@@ -45,7 +48,7 @@ class UploadPostActivity : AppCompatActivity() {
 
         binding.apply {
             materialToolbar.setOnClickListener {
-                finish()
+                navigateToNextActivityWithReplacement(this@UploadPostActivity,HomeActivity::class.java)
             }
 
             imageView1.setOnClickListener {
@@ -53,23 +56,34 @@ class UploadPostActivity : AppCompatActivity() {
             }
 
             buttonPost.setOnClickListener {
-
                 //post are added properly
                 //also kept the post user wise
-
                 val post: Post = Post(imageUrl ?: "",userPostTextField.editText?.text.toString())
                 uploadPost(post)
+            }
 
+            buttonCancel.setOnClickListener {
+                navigateToNextActivityWithReplacement(this@UploadPostActivity,HomeActivity::class.java)
             }
         }
     }
 
     private fun uploadPost(post: Post) {
-        Firebase.firestore.collection(POST).document().set(post).addOnSuccessListener {
-            Firebase.firestore.collection(Firebase.auth.currentUser!!.uid).document().set(post)
-                .addOnSuccessListener {
-                    finish()
-                }
-        }
+        val postCollection = Firebase.firestore.collection(POST)
+        val userCollection = Firebase.firestore.collection(Firebase.auth.currentUser!!.uid)
+
+        postCollection.document().set(post)
+            .addOnSuccessListener {
+                userCollection.document().set(post)
+                    .addOnSuccessListener {
+                        navigateToNextActivityWithReplacement(this@UploadPostActivity, HomeActivity::class.java)
+                    }
+                    .addOnFailureListener { exception ->
+                        Log.e("UploadPostActivity", "Failed to set post to user collection: ${exception.message}")
+                    }
+            }
+            .addOnFailureListener { exception ->
+                Log.e("UploadPostActivity", "Failed to set post to post collection: ${exception.message}")
+            }
     }
 }

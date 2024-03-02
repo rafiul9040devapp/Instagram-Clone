@@ -11,11 +11,12 @@ import com.rafiul.instagramclone.databinding.FragmentPostBinding
 import com.rafiul.instagramclone.screens.upload.UploadPostActivity
 import com.rafiul.instagramclone.screens.upload.UploadReelsActivity
 import com.rafiul.instagramclone.utils.navigateToNextActivity
+import com.rafiul.instagramclone.utils.navigateToNextActivityWithReplacement
 
 
 class PostFragment : BottomSheetDialogFragment() {
 
-    private lateinit var binding: FragmentPostBinding
+    private val binding: FragmentPostBinding by lazy { FragmentPostBinding.inflate(layoutInflater) }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -26,7 +27,6 @@ class PostFragment : BottomSheetDialogFragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentPostBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -36,11 +36,11 @@ class PostFragment : BottomSheetDialogFragment() {
         binding.apply {
 
             linearLayoutAddPost.setOnClickListener {
-                navigateToNextActivity(requireActivity(), UploadPostActivity::class.java)
+                navigateToNextActivityWithReplacement(requireActivity(), UploadPostActivity::class.java)
             }
 
             linearLayoutAddReels.setOnClickListener {
-                navigateToNextActivity(requireActivity(), UploadReelsActivity::class.java)
+                navigateToNextActivityWithReplacement(requireActivity(), UploadReelsActivity::class.java)
             }
         }
     }

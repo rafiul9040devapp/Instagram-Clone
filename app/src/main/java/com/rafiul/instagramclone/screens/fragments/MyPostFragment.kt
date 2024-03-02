@@ -17,7 +17,7 @@ import com.rafiul.instagramclone.models.Post
 
 class MyPostFragment : Fragment() {
 
-    private lateinit var binding: FragmentMyPostBinding
+    private val binding: FragmentMyPostBinding by lazy { FragmentMyPostBinding.inflate(layoutInflater) }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
@@ -26,8 +26,6 @@ class MyPostFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-
-        binding = FragmentMyPostBinding.inflate(inflater, container, false)
 
         val postList = ArrayList<Post>()
 
@@ -60,10 +58,6 @@ class MyPostFragment : Fragment() {
                 postAdapter.notifyDataSetChanged()
             }
         }
-
-//        Firebase.firestore.collection(Firebase.auth.currentUser!!.uid).get()
-//            .addOnSuccessListener {
-//            }
     }
 
 }
