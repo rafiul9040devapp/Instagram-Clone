@@ -8,11 +8,14 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.firestore
+import com.google.firebase.firestore.toObject
 import com.rafiul.instagramclone.databinding.ActivityUploadReelsBinding
 import com.rafiul.instagramclone.models.Reel
+import com.rafiul.instagramclone.models.User
 import com.rafiul.instagramclone.screens.activities.HomeActivity
 import com.rafiul.instagramclone.utils.REEL
 import com.rafiul.instagramclone.utils.REELS_FOLDER
+import com.rafiul.instagramclone.utils.USER_NODE
 import com.rafiul.instagramclone.utils.navigateToNextActivityWithReplacement
 import com.rafiul.instagramclone.utils.uploadImage
 import com.rafiul.instagramclone.utils.uploadVideo
@@ -67,8 +70,11 @@ class UploadReelsActivity : AppCompatActivity() {
             }
 
             buttonReels.setOnClickListener {
-                val reel = Reel(videoUrl, userPostTextField.editText?.text.toString())
-                uploadReels(reel)
+                Firebase.firestore.collection(USER_NODE).document(Firebase.auth.currentUser!!.uid).get().addOnSuccessListener {
+                    val user = it.toObject<User>()
+                    val reel = Reel(videoUrl, userPostTextField.editText?.text.toString(),user?.image ?: "")
+                    uploadReels(reel)
+                }
             }
         }
     }

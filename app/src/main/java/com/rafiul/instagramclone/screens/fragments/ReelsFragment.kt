@@ -1,60 +1,65 @@
 package com.rafiul.instagramclone.screens.fragments
 
+import android.annotation.SuppressLint
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.rafiul.instagramclone.R
+import androidx.fragment.app.Fragment
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
+import com.google.firebase.firestore.firestore
+import com.google.firebase.firestore.toObject
+import com.rafiul.instagramclone.adapters.ReelsAdapter
+import com.rafiul.instagramclone.databinding.FragmentReelsBinding
+import com.rafiul.instagramclone.models.Reel
+import com.rafiul.instagramclone.models.User
+import com.rafiul.instagramclone.utils.REEL
+import com.rafiul.instagramclone.utils.USER_NODE
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [ReelsFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class ReelsFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
+
+    private val binding: FragmentReelsBinding by lazy { FragmentReelsBinding.inflate(layoutInflater) }
+    private val reelsList = ArrayList<Reel>()
+    private lateinit var reelsAdapter : ReelsAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_reels, container, false)
+    ): View {
+        reelsAdapter = ReelsAdapter(requireContext(),reelsList)
+        binding.viewPager.adapter = reelsAdapter
+
+        getAllReels(reelsList,reelsAdapter)
+
+
+        return binding.root
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment ReelsFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            ReelsFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
+    @SuppressLint("NotifyDataSetChanged")
+    private fun getAllReels(reelsList:ArrayList<Reel>, reelsAdapter: ReelsAdapter) {
+        Firebase.firestore.collection(REEL).get()
+            .addOnSuccessListener { querySnapshot ->
+                val tempList = arrayListOf<Reel>()
+                reelsList.clear()
+                for (document in querySnapshot.documents) {
+                    val reel = document.toObject<Reel>()
+                    reel?.let { tempList.add(it) }
                 }
+
+//                reelsList.apply {
+//                    addAll(tempList)
+//                    reversed()
+//                }
+                reelsList.addAll(tempList)
+                reelsList.reversed()
+                reelsAdapter.notifyDataSetChanged()
             }
+
+
     }
 }
