@@ -26,7 +26,7 @@ fun uploadImage(uri: Uri, folderName: String, callback: (String?) -> Unit) {
         }
 }
 
-fun uploadVideo(uri: Uri, folderName: String, progressDialog: ProgressDialog  ,  callback: (String?) -> Unit) {
+fun uploadVideo(uri: Uri, folderName: String, context: Context, progressDialog: ProgressDialog  ,  callback: (String?) -> Unit) {
 
     var videoUrl: String? = null
     progressDialog.setTitle("Uploading . . . .")
@@ -38,6 +38,7 @@ fun uploadVideo(uri: Uri, folderName: String, progressDialog: ProgressDialog  , 
             uploadTask.storage.downloadUrl.addOnSuccessListener { uri ->
                 videoUrl = uri.toString()
                 progressDialog.dismiss()
+                showLongToast(context,"Reel Uploaded Successfully.....")
                 callback(videoUrl)
             }.addOnFailureListener {
                 callback(null)

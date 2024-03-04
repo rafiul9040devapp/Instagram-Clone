@@ -25,7 +25,7 @@ class UploadReelsActivity : AppCompatActivity() {
 
     private val launcher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         uri?.let {
-            uploadVideo(uri, REELS_FOLDER, progressDialog) { url ->
+            uploadVideo(uri, REELS_FOLDER,this@UploadReelsActivity, progressDialog) { url ->
                 if (url != null) {
                     videoUrl = url
                 }
