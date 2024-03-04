@@ -44,7 +44,4 @@ class PostFragment : BottomSheetDialogFragment() {
             }
         }
     }
-
-    companion object {
-    }
 }
