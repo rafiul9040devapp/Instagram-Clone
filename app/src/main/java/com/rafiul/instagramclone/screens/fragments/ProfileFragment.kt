@@ -1,6 +1,6 @@
 package com.rafiul.instagramclone.screens.fragments
 
-import android.content.Intent
+
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -16,7 +16,6 @@ import com.rafiul.instagramclone.databinding.FragmentProfileBinding
 import com.rafiul.instagramclone.models.User
 import com.rafiul.instagramclone.screens.activities.SignUpActivity
 import com.rafiul.instagramclone.utils.USER_NODE
-import com.rafiul.instagramclone.utils.navigateToNextActivityWithData
 import com.rafiul.instagramclone.utils.navigateToNextActivityWithReplacementAndData
 import com.squareup.picasso.Picasso
 

@@ -7,11 +7,15 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.firestore
+import com.google.firebase.firestore.toObject
+import com.google.type.DateTime
 import com.rafiul.instagramclone.databinding.ActivityUploadPostBinding
 import com.rafiul.instagramclone.models.Post
+import com.rafiul.instagramclone.models.User
 import com.rafiul.instagramclone.screens.activities.HomeActivity
 import com.rafiul.instagramclone.utils.POST
 import com.rafiul.instagramclone.utils.POST_FOLDER
+import com.rafiul.instagramclone.utils.USER_NODE
 import com.rafiul.instagramclone.utils.navigateToNextActivityWithReplacement
 import com.rafiul.instagramclone.utils.uploadImage
 
@@ -36,6 +40,8 @@ class UploadPostActivity : AppCompatActivity() {
         }
     }
 
+    private lateinit var post: Post
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
@@ -58,7 +64,12 @@ class UploadPostActivity : AppCompatActivity() {
             buttonPost.setOnClickListener {
                 //post are added properly
                 //also kept the post user wise
-                val post: Post = Post(imageUrl ?: "",userPostTextField.editText?.text.toString())
+                Firebase.firestore.collection(USER_NODE).document(Firebase.auth.currentUser!!.uid).get().addOnSuccessListener {
+                    val user = it.toObject<User>()
+                    if (user != null) {
+                        post= Post(imageUrl ?: "",userPostTextField.editText?.text.toString(),user.name ?: "" ,System.currentTimeMillis().toString(),user.image ?: "")
+                    }
+                }
                 uploadPost(post)
             }
 
