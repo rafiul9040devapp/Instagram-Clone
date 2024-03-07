@@ -1,60 +1,85 @@
 package com.rafiul.instagramclone.screens.fragments
 
+import android.annotation.SuppressLint
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.rafiul.instagramclone.R
+import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.QuerySnapshot
+import com.google.firebase.firestore.firestore
+import com.google.firebase.firestore.toObject
+import com.rafiul.instagramclone.adapters.SearchPersonAdapter
+import com.rafiul.instagramclone.databinding.FragmentSearchBinding
+import com.rafiul.instagramclone.models.User
+import com.rafiul.instagramclone.utils.USER_NODE
+import com.rafiul.instagramclone.utils.showLongToast
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [SearchFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class SearchFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
+    private val binding: FragmentSearchBinding by lazy {
+        FragmentSearchBinding.inflate(
+            layoutInflater
+        )
     }
+
+    private lateinit var searchPersonAdapter: SearchPersonAdapter
+    private val personList = ArrayList<User>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_search, container, false)
+    ): View {
+        return binding.root
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment SearchFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            SearchFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        setupRecyclerView()
+        getAllUsers()
+
+        binding.searchView.setOnSearchClickListener {
+
+        }
+    }
+
+
+    private fun setupRecyclerView() {
+        searchPersonAdapter = SearchPersonAdapter(requireContext(), personList)
+        binding.rcvPerson.apply {
+            adapter = searchPersonAdapter
+            layoutManager = LinearLayoutManager(requireContext())
+        }
+    }
+
+    private fun getAllUsers() {
+        val currentUserUid = FirebaseAuth.getInstance().currentUser?.uid ?: return
+       Firebase.firestore.collection(USER_NODE)
+            .get()
+            .addOnSuccessListener { querySnapshot ->
+                handleQuerySnapshot(querySnapshot, currentUserUid)
             }
+            .addOnFailureListener { exception ->
+                showLongToast(requireContext(),exception.toString())
+            }
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    private fun handleQuerySnapshot(querySnapshot: QuerySnapshot, currentUserUid: String) {
+        val tempList = mutableListOf<User>()
+        querySnapshot.documents.forEach { document ->
+            val userId = document.id
+            if (userId != currentUserUid) {
+                val user = document.toObject<User>()
+                user?.let { tempList.add(it) }
+            }
+        }
+        personList.clear()
+        personList.addAll(tempList.reversed())
+        searchPersonAdapter.notifyDataSetChanged()
     }
 }
