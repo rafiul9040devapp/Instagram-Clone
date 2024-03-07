@@ -46,6 +46,7 @@ class UploadPostActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         setSupportActionBar(binding.materialToolbar)
+        post = Post()
 
         supportActionBar?.let { actionBar ->
             actionBar.setDisplayHomeAsUpEnabled(true)
@@ -54,7 +55,10 @@ class UploadPostActivity : AppCompatActivity() {
 
         binding.apply {
             materialToolbar.setOnClickListener {
-                navigateToNextActivityWithReplacement(this@UploadPostActivity,HomeActivity::class.java)
+                navigateToNextActivityWithReplacement(
+                    this@UploadPostActivity,
+                    HomeActivity::class.java
+                )
             }
 
             imageView1.setOnClickListener {
@@ -64,22 +68,32 @@ class UploadPostActivity : AppCompatActivity() {
             buttonPost.setOnClickListener {
                 //post are added properly
                 //also kept the post user wise
-                Firebase.firestore.collection(USER_NODE).document(Firebase.auth.currentUser!!.uid).get().addOnSuccessListener {
+                Firebase.firestore.collection(USER_NODE).document(Firebase.auth.currentUser!!.uid)
+                    .get().addOnSuccessListener {
                     val user = it.toObject<User>()
                     if (user != null) {
-                        post= Post(imageUrl ?: "",userPostTextField.editText?.text.toString(),user.name ?: "" ,System.currentTimeMillis().toString(),user.image ?: "")
+                        post = Post(
+                            postUrl = imageUrl ?: "",
+                            caption = userPostTextField.editText?.text.toString(),
+                            name = user.name ?: "",
+                            image = user.image ?: "",
+                            time = System.currentTimeMillis().toString()
+                        )
+                        uploadPost()
                     }
                 }
-                uploadPost(post)
             }
 
             buttonCancel.setOnClickListener {
-                navigateToNextActivityWithReplacement(this@UploadPostActivity,HomeActivity::class.java)
+                navigateToNextActivityWithReplacement(
+                    this@UploadPostActivity,
+                    HomeActivity::class.java
+                )
             }
         }
     }
 
-    private fun uploadPost(post: Post) {
+    private fun uploadPost() {
         val postCollection = Firebase.firestore.collection(POST)
         val userCollection = Firebase.firestore.collection(Firebase.auth.currentUser!!.uid)
 
@@ -87,14 +101,23 @@ class UploadPostActivity : AppCompatActivity() {
             .addOnSuccessListener {
                 userCollection.document().set(post)
                     .addOnSuccessListener {
-                        navigateToNextActivityWithReplacement(this@UploadPostActivity, HomeActivity::class.java)
+                        navigateToNextActivityWithReplacement(
+                            this@UploadPostActivity,
+                            HomeActivity::class.java
+                        )
                     }
                     .addOnFailureListener { exception ->
-                        Log.e("UploadPostActivity", "Failed to set post to user collection: ${exception.message}")
+                        Log.e(
+                            "UploadPostActivity",
+                            "Failed to set post to user collection: ${exception.message}"
+                        )
                     }
             }
             .addOnFailureListener { exception ->
-                Log.e("UploadPostActivity", "Failed to set post to post collection: ${exception.message}")
+                Log.e(
+                    "UploadPostActivity",
+                    "Failed to set post to post collection: ${exception.message}"
+                )
             }
     }
 }

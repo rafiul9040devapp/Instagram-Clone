@@ -33,16 +33,19 @@ class HomeFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View{
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         setHasOptionsMenu(true)
         (requireActivity() as AppCompatActivity).setSupportActionBar(binding.toolbar)
         postAdapter = PostAdapter(requireContext(),postList)
 
-        binding.rceAllPosts.apply {
-            layoutManager = LinearLayoutManager(requireContext())
+        binding.rcvAllPosts.apply {
             adapter = postAdapter
         }
         getAllPost()
-        return binding.root
     }
 
     @SuppressLint("NotifyDataSetChanged")
@@ -60,6 +63,7 @@ class HomeFragment : Fragment() {
         }
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.option_menu,menu)
         super.onCreateOptionsMenu(menu, inflater)

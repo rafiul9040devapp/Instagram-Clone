@@ -4,11 +4,12 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.rafiul.instagramclone.R
 import com.rafiul.instagramclone.databinding.ViewHolderMyPostBinding
 import com.rafiul.instagramclone.models.Post
 import com.squareup.picasso.Picasso
 
-class MyPostRecViewAdapter(var context: Context, var postList: ArrayList<Post>) :
+class MyPostRecViewAdapter(var context: Context, private var postList: ArrayList<Post>) :
     RecyclerView.Adapter<MyPostRecViewAdapter.ViewHolder>() {
 
     inner class ViewHolder(val binding: ViewHolderMyPostBinding) :
@@ -23,8 +24,15 @@ class MyPostRecViewAdapter(var context: Context, var postList: ArrayList<Post>) 
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+
+        val postImage = postList[position]
+
         holder.binding.imageViewPost.let { imageView ->
-            Picasso.get().load(postList[position].postUrl).into(imageView)
+           if (postImage.postUrl == null){
+              imageView.setImageResource(R.drawable.loading)
+           }else{
+               Picasso.get().load(postImage.postUrl).into(imageView)
+           }
         }
     }
 }

@@ -44,6 +44,7 @@ class ReelsAdapter(val context: Context, private val reelsList: List<Reel>) :
                 setOnPreparedListener {
                     progressBar.visibility = View.GONE
                     videoViewReels.start()
+                    videoViewReels.seekTo(1)
                 }
             }
         }
