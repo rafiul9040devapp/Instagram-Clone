@@ -1,30 +1,40 @@
 package com.rafiul.instagramclone.adapters
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.rafiul.instagramclone.R
 import com.rafiul.instagramclone.databinding.ViewHolderPersonBinding
 import com.rafiul.instagramclone.models.User
 
-class SearchPersonAdapter(val context: Context, private var personList: ArrayList<User>) :
-    RecyclerView.Adapter<SearchPersonAdapter.ViewHolder>() {
-
+class SearchPersonAdapterAlternative(val context: Context) :
+    ListAdapter<User, SearchPersonAdapterAlternative.ViewHolder>(COMPARATOR) {
 
     inner class ViewHolder(val binding: ViewHolderPersonBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(user: User) {
+        fun bindWithView(user: User) {
             with(binding) {
                 Glide.with(context)
                     .load(user.image)
                     .centerCrop()
                     .placeholder(R.drawable.user)
                     .into(imageViewProfile)
-
                 textViewUserName.text = user.name ?: ""
+            }
+        }
+    }
+
+    companion object {
+        val COMPARATOR = object : DiffUtil.ItemCallback<User>() {
+            override fun areItemsTheSame(oldItem: User, newItem: User): Boolean {
+                return oldItem == newItem
+            }
+            override fun areContentsTheSame(oldItem: User, newItem: User): Boolean {
+                return oldItem.email == newItem.email
             }
         }
     }
@@ -39,17 +49,7 @@ class SearchPersonAdapter(val context: Context, private var personList: ArrayLis
         )
     }
 
-    override fun getItemCount(): Int = personList.size
-
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val person = personList[position]
-        holder.bind(user = person)
-    }
-
-
-    @SuppressLint("NotifyDataSetChanged")
-    fun setFilteredList(personList: ArrayList<User>){
-        this.personList = personList
-        notifyDataSetChanged()
+        holder.bindWithView(getItem(position))
     }
 }

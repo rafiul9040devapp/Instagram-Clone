@@ -60,7 +60,7 @@ dependencies {
     implementation ("de.hdodenhof:circleimageview:3.1.0")
     implementation(platform("com.google.firebase:firebase-bom:32.7.3"))
 
-    implementation ("com.squareup.picasso:picasso:2.8")
+    implementation ("com.squareup.picasso:picasso:2.71828")
     implementation ("androidx.viewpager2:viewpager2:1.0.0")
     implementation ("com.makeramen:roundedimageview:2.3.0")
 

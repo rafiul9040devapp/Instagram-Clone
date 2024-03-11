@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.Firebase
@@ -18,6 +19,8 @@ import com.rafiul.instagramclone.databinding.FragmentSearchBinding
 import com.rafiul.instagramclone.models.User
 import com.rafiul.instagramclone.utils.USER_NODE
 import com.rafiul.instagramclone.utils.showLongToast
+import com.rafiul.instagramclone.utils.showShortToast
+import java.util.Locale
 
 class SearchFragment : Fragment() {
 
@@ -42,10 +45,53 @@ class SearchFragment : Fragment() {
         setupRecyclerView()
         getAllUsers()
 
-        binding.searchView.setOnSearchClickListener {
+        binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                return false
+            }
 
+            override fun onQueryTextChange(newText: String?): Boolean {
+                filterUserList(newText)
+                return true
+            }
+
+        })
+    }
+
+    private fun filterUserList(query: String?) {
+        var filteredList: ArrayList<User>
+        query?.let { q ->
+             filteredList = personList.filter { person ->
+                 val nameLowercase = person.name.orEmpty().lowercase(Locale.ROOT)
+                 nameLowercase.contains(q.lowercase(Locale.ROOT))
+             } as ArrayList<User>
+            if (filteredList.isEmpty()) {
+                showShortToast(requireContext(), "No Data Found")
+            } else {
+                searchPersonAdapter.setFilteredList(filteredList)
+            }
         }
     }
+
+
+//    private fun filterUserList(query: String?) {
+//        if (query != null) {
+//            val filteredList = ArrayList<User>()
+//            for (person in personList) {
+//                if (person.name?.lowercase(Locale.ROOT)
+//                        ?.contains(query) == true || person.name?.uppercase(Locale.ROOT)
+//                        ?.contains(query) == true
+//                ) {
+//                    filteredList.add(person)
+//                }
+//            }
+//            if (filteredList.isEmpty()) {
+//                showShortToast(requireContext(), "No Data Found")
+//            } else {
+//                searchPersonAdapter.setFilteredList(filteredList)
+//            }
+//        }
+//    }
 
 
     private fun setupRecyclerView() {
@@ -58,13 +104,13 @@ class SearchFragment : Fragment() {
 
     private fun getAllUsers() {
         val currentUserUid = FirebaseAuth.getInstance().currentUser?.uid ?: return
-       Firebase.firestore.collection(USER_NODE)
+        Firebase.firestore.collection(USER_NODE)
             .get()
             .addOnSuccessListener { querySnapshot ->
                 handleQuerySnapshot(querySnapshot, currentUserUid)
             }
             .addOnFailureListener { exception ->
-                showLongToast(requireContext(),exception.toString())
+                showLongToast(requireContext(), exception.toString())
             }
     }
 
