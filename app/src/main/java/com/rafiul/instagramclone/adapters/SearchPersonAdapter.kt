@@ -6,9 +6,13 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.firestore
 import com.rafiul.instagramclone.R
 import com.rafiul.instagramclone.databinding.ViewHolderPersonBinding
 import com.rafiul.instagramclone.models.User
+import com.rafiul.instagramclone.utils.FOLLOW
 
 class SearchPersonAdapter(val context: Context, private var personList: ArrayList<User>) :
     RecyclerView.Adapter<SearchPersonAdapter.ViewHolder>() {
@@ -16,7 +20,9 @@ class SearchPersonAdapter(val context: Context, private var personList: ArrayLis
 
     inner class ViewHolder(val binding: ViewHolderPersonBinding) :
         RecyclerView.ViewHolder(binding.root) {
+        @SuppressLint("SetTextI18n")
         fun bind(user: User) {
+            var isFollow = false
             with(binding) {
                 Glide.with(context)
                     .load(user.image)
@@ -25,6 +31,36 @@ class SearchPersonAdapter(val context: Context, private var personList: ArrayLis
                     .into(imageViewProfile)
 
                 textViewUserName.text = user.name ?: ""
+
+                Firebase.firestore.collection(FirebaseAuth.getInstance().currentUser?.uid + FOLLOW)
+                    .whereEqualTo("email", user.email).get().addOnSuccessListener {
+                        if (it.documents.size == 0) {
+                            isFollow = false
+                        } else {
+                            button.text = "Unfollow"
+                        }
+                    }
+
+
+                button.setOnClickListener {
+
+                    if (isFollow) {
+                        Firebase.firestore.collection(FirebaseAuth.getInstance().currentUser?.uid + FOLLOW)
+                            .whereEqualTo("email", user.email).get().addOnSuccessListener {
+                                Firebase.firestore.collection(FirebaseAuth.getInstance().currentUser?.uid + FOLLOW)
+                                    .document(it.documents[0].id).delete()
+                                button.text = "Follow"
+                                isFollow = false
+                            }
+
+                    } else {
+                        Firebase.firestore.collection(FirebaseAuth.getInstance().currentUser?.uid + FOLLOW)
+                            .document().set(user)
+                        button.text = "Unfollow"
+                        isFollow = true
+                    }
+
+                }
             }
         }
     }
@@ -48,7 +84,7 @@ class SearchPersonAdapter(val context: Context, private var personList: ArrayLis
 
 
     @SuppressLint("NotifyDataSetChanged")
-    fun setFilteredList(personList: ArrayList<User>){
+    fun setFilteredList(personList: ArrayList<User>) {
         this.personList = personList
         notifyDataSetChanged()
     }
